@@ -21,4 +21,12 @@ public class DailyRecord {
     public void add(DailyTask task) {
         tasks.add(task);
     }
+
+    public ArrayList<String> getTaskNames() {
+        ArrayList<String> names = new ArrayList<>();
+        for (DailyTask task: tasks) {
+            names.add(task.getName());
+        }
+        return names;    
+    }
 }
