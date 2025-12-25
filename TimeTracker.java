@@ -17,13 +17,13 @@ public class TimeTracker {
     public TimeTracker() throws IOException {
         weeklyRecords = new ArrayList<DailyRecord>();
         readFile(FILE_NAME);
-        // if (weeklyRecords.isEmpty || getCurrentRecord().getDate().isBefore(LocalDate.now())) add(DailyRecord())
         if (weeklyRecords.isEmpty()) {
             taskNames = new ArrayList<String>();
             weeklyTotalsByTask = new HashMap<>();
-        } // else?
-        taskNames = getCurrentRecord().getTaskNames();
-        weeklyTotalsByTask = getWeeklyTotals();
+        } else {
+            updateTotalsAndTasks();
+        }
+        
     }
 
     public DailyRecord getCurrentRecord() {
@@ -48,6 +48,14 @@ public class TimeTracker {
             System.out.printf("%s: %s\n", name, minutesToHoursDoubleString(totalMinutes));
         }
         System.out.println("\n");
+    }
+
+    public void printMainMenu() {
+        String[] options = {"Log Time", "Add Daily Task", "Delete Daily Task", "Quit"};
+        for (int i = 0; i < options.length; i++) {
+            System.out.printf("%d. %s\n", (i + 1), options[i]);
+        }
+        System.out.println();
     }
 
     public void addTime(int minutes, int index) {
@@ -102,8 +110,15 @@ public class TimeTracker {
                 System.out.println("Error: " + e.getMessage());
             }            
         }
-        
+    }
 
+    private void addRecord(LocalDate date) {
+        taskNames = getCurrentRecord().getTaskNames();
+                DailyRecord newRecord = new DailyRecord(date);
+                for (String taskName : taskNames) {
+                    newRecord.add(new DailyTask(date, taskName, 0));
+                }
+                weeklyRecords.add(newRecord);
     }
 
     private HashMap<String, Integer> getWeeklyTotals() {
@@ -122,6 +137,17 @@ public class TimeTracker {
         }
 
         return totals;
+    }
+
+    private void updateTotalsAndTasks() {
+        LocalDate today = LocalDate.now();
+        if (getCurrentRecord().getDate().isBefore(today)) {
+                addRecord(today);
+            } else {
+                taskNames = getCurrentRecord().getTaskNames();
+            }
+
+            weeklyTotalsByTask = getWeeklyTotals();
     }
 
     private static String minutesToHoursString(int mins) {
