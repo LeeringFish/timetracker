@@ -1,15 +1,23 @@
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 public class TimeTracker {
+    private final String FILE_NAME = "time_log.txt";
+    
     private ArrayList<DailyRecord> weeklyRecords;
     private ArrayList<String> taskNames;
     private Map<String, Integer> weeklyTotalsByTask;
 
-    public TimeTracker() {
+    public TimeTracker() throws IOException {
         weeklyRecords = new ArrayList<DailyRecord>();
-        // readFile() into weeklyRecords
+        readFile(FILE_NAME);
+        // if (weeklyRecords.isEmpty || getCurrentRecord().getDate().isBefore(LocalDate.now())) add(DailyRecord())
         taskNames = getCurrentRecord().getTaskNames();
         weeklyTotalsByTask = getWeeklyTotals();
     }
@@ -19,7 +27,8 @@ public class TimeTracker {
     }
 
     public void printToday() {
-        System.out.println("\nThis is where the date goes");
+        System.out.println();
+        System.out.println(LocalDate.now());
         System.out.println("--------");
         for (DailyTask task : getCurrentRecord().getTasks()) {
             System.out.printf("%s: %s\n", task.getName(), minutesToHoursString(task.getMinutes()));
@@ -35,6 +44,48 @@ public class TimeTracker {
             System.out.printf("%s: %s\n", name, minutesToHoursDoubleString(totalMinutes));
         }
         System.out.println("\n");
+    }
+
+    private void readFile(String fileName) throws IOException {
+        Path path = Path.of(fileName);
+        if (Files.notExists(path)) {
+            Files.createFile(path);
+        }
+        
+        try (Scanner fileReader = new Scanner(path)) {
+            String line;
+            String[] parts;
+            LocalDate newDate, currentDate = null;
+            DailyRecord currentRecord = null;
+
+            while (fileReader.hasNextLine()) {
+                line = fileReader.nextLine();
+                parts = line.split(";");
+
+                newDate = LocalDate.parse(parts[0]);
+                if (dateNotInPastWeek(newDate)) {
+                    continue;
+                }
+
+                if (currentDate == null) {
+                    currentRecord = new DailyRecord(newDate);
+                    currentDate = newDate;
+                }
+
+                if (newDate.isAfter(currentDate)) {
+                    weeklyRecords.add(currentRecord);
+                    currentDate = newDate;
+                    currentRecord = new DailyRecord(newDate);
+                }
+
+                currentRecord.add(new DailyTask(newDate, parts[1], Integer.parseInt(parts[2])));
+            }
+
+            weeklyRecords.add(currentRecord);
+
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
     private HashMap<String, Integer> getWeeklyTotals() {
@@ -79,6 +130,11 @@ public class TimeTracker {
         int minutes = mins % 60;
         double total = hours + ((double) minutes / 60);
 
-        return total + " hours";
+        return String.format("%.1f hours", total);
+    }
+
+    private static boolean dateNotInPastWeek(LocalDate date) {
+        LocalDate start = LocalDate.now().minusDays(6);
+        return date.isBefore(start);
     }
 }
