@@ -6,7 +6,15 @@ public class Main {
         TimeTracker tracker = new TimeTracker();
         tracker.printToday();
         tracker.printWeek();
-        tracker.printMainMenu();
+        //tracker.printMainMenu();
+
+        tracker.printAddRemoveMenu();
+
+        //tracker.removeTask("SPD");
+
+        //tracker.printToday();
+        //tracker.printWeek();
+        //tracker.printAddRemoveMenu();
 
 
         //tracker.addTime(30, 0);

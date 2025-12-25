@@ -58,6 +58,16 @@ public class TimeTracker {
         System.out.println();
     }
 
+    public void printAddRemoveMenu() {
+        int i = 0;
+        while (i < taskNames.size()) {
+            System.out.printf("%d. %s\n", (i + 1), taskNames.get(i));
+            i++;
+        }
+        i++;
+        System.out.println(i + ". Main Menu");
+    }
+
     public void addTime(int minutes, int index) {
         // assuming correct index based on menu
         getCurrentRecord().getTasks().get(index).addMinutes(minutes);
@@ -68,6 +78,24 @@ public class TimeTracker {
         getCurrentRecord().add(new DailyTask(LocalDate.now(), taskName, 0));
         taskNames.add(taskName);
         weeklyTotalsByTask = getWeeklyTotals();
+    }
+
+    public boolean removeTask(String taskName) {
+        DailyTask taskToRemove = null;
+        for (DailyTask task : getCurrentRecord().getTasks()) {
+            if (task.getName().equals(taskName)) {
+                taskToRemove = task;
+                break;
+            }
+        }
+        if (taskToRemove != null) {
+            getCurrentRecord().getTasks().remove(taskToRemove);
+            taskNames = getCurrentRecord().getTaskNames();
+            weeklyTotalsByTask = getWeeklyTotals();
+            return true;
+        }
+
+        return false;
     }
 
     private void readFile(String fileName) throws IOException {
