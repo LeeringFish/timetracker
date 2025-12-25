@@ -6,6 +6,13 @@ public class Main {
         TimeTracker tracker = new TimeTracker();
         tracker.printToday();
         tracker.printWeek();
+
+        tracker.addTime(30, 0);
+
+        tracker.printToday();
+        tracker.printWeek();
+        
+
     }
 
 }

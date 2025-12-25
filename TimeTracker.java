@@ -18,6 +18,10 @@ public class TimeTracker {
         weeklyRecords = new ArrayList<DailyRecord>();
         readFile(FILE_NAME);
         // if (weeklyRecords.isEmpty || getCurrentRecord().getDate().isBefore(LocalDate.now())) add(DailyRecord())
+        if (weeklyRecords.isEmpty()) {
+            taskNames = new ArrayList<String>();
+            weeklyTotalsByTask = new HashMap<>();
+        } // else?
         taskNames = getCurrentRecord().getTaskNames();
         weeklyTotalsByTask = getWeeklyTotals();
     }
@@ -46,46 +50,60 @@ public class TimeTracker {
         System.out.println("\n");
     }
 
+    public void addTime(int minutes, int index) {
+        // assuming correct index based on menu
+        getCurrentRecord().getTasks().get(index).addMinutes(minutes);
+        weeklyTotalsByTask = getWeeklyTotals();
+    }
+
+    public void addNewTask(String taskName) {
+        getCurrentRecord().add(new DailyTask(LocalDate.now(), taskName, 0));
+        taskNames.add(taskName);
+        weeklyTotalsByTask = getWeeklyTotals();
+    }
+
     private void readFile(String fileName) throws IOException {
         Path path = Path.of(fileName);
         if (Files.notExists(path)) {
             Files.createFile(path);
+        } else {
+            try (Scanner fileReader = new Scanner(path)) {
+                String line;
+                String[] parts;
+                LocalDate newDate, currentDate = null;
+                DailyRecord currentRecord = null;
+
+                while (fileReader.hasNextLine()) {
+                    line = fileReader.nextLine();
+                    parts = line.split(";");
+
+                    newDate = LocalDate.parse(parts[0]);
+                    if (dateNotInPastWeek(newDate)) {
+                        continue;
+                    }
+
+                    if (currentDate == null) {
+                        currentRecord = new DailyRecord(newDate);
+                        currentDate = newDate;
+                    }
+
+                    if (newDate.isAfter(currentDate)) {
+                        weeklyRecords.add(currentRecord);
+                        currentDate = newDate;
+                        currentRecord = new DailyRecord(newDate);
+                    }
+
+                    currentRecord.add(new DailyTask(newDate, parts[1], Integer.parseInt(parts[2])));
+                }
+
+                weeklyRecords.add(currentRecord);
+
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+            }            
         }
         
-        try (Scanner fileReader = new Scanner(path)) {
-            String line;
-            String[] parts;
-            LocalDate newDate, currentDate = null;
-            DailyRecord currentRecord = null;
 
-            while (fileReader.hasNextLine()) {
-                line = fileReader.nextLine();
-                parts = line.split(";");
-
-                newDate = LocalDate.parse(parts[0]);
-                if (dateNotInPastWeek(newDate)) {
-                    continue;
-                }
-
-                if (currentDate == null) {
-                    currentRecord = new DailyRecord(newDate);
-                    currentDate = newDate;
-                }
-
-                if (newDate.isAfter(currentDate)) {
-                    weeklyRecords.add(currentRecord);
-                    currentDate = newDate;
-                    currentRecord = new DailyRecord(newDate);
-                }
-
-                currentRecord.add(new DailyTask(newDate, parts[1], Integer.parseInt(parts[2])));
-            }
-
-            weeklyRecords.add(currentRecord);
-
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-        }
     }
 
     private HashMap<String, Integer> getWeeklyTotals() {
