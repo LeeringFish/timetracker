@@ -51,7 +51,7 @@ public class TimeTracker {
     }
 
     public void printMainMenu() {
-        String[] options = {"Log Time", "Add Daily Task", "Delete Daily Task", "Quit"};
+        String[] options = {"Log Time", "Add Daily Task", "Remove Daily Task", "Quit"};
         for (int i = 0; i < options.length; i++) {
             System.out.printf("%d. %s\n", (i + 1), options[i]);
         }
@@ -59,13 +59,14 @@ public class TimeTracker {
     }
 
     public void printAddRemoveMenu() {
+        System.out.println();
         int i = 0;
         while (i < taskNames.size()) {
             System.out.printf("%d. %s\n", (i + 1), taskNames.get(i));
             i++;
         }
         i++;
-        System.out.println(i + ". Main Menu");
+        System.out.println(i + ". Main Menu\n");
     }
 
     public void addTime(int minutes, int index) {
@@ -75,27 +76,34 @@ public class TimeTracker {
     }
 
     public void addNewTask(String taskName) {
-        getCurrentRecord().add(new DailyTask(LocalDate.now(), taskName, 0));
+        LocalDate today = LocalDate.now();
+        if (recordsAreEmpty()) {
+            weeklyRecords.add(new DailyRecord(today));
+        }
+        getCurrentRecord().add(new DailyTask(today, taskName, 0));
         taskNames.add(taskName);
         weeklyTotalsByTask = getWeeklyTotals();
     }
 
-    public boolean removeTask(String taskName) {
-        DailyTask taskToRemove = null;
-        for (DailyTask task : getCurrentRecord().getTasks()) {
-            if (task.getName().equals(taskName)) {
-                taskToRemove = task;
-                break;
-            }
-        }
-        if (taskToRemove != null) {
-            getCurrentRecord().getTasks().remove(taskToRemove);
-            taskNames = getCurrentRecord().getTaskNames();
-            weeklyTotalsByTask = getWeeklyTotals();
+    public String removeTask(int index) {
+        String taskName = getCurrentRecord().getTasks().get(index).getName();
+        getCurrentRecord().getTasks().remove(index);
+        taskNames = getCurrentRecord().getTaskNames();
+        weeklyTotalsByTask = getWeeklyTotals();
+        return taskName;
+    }
+
+    public boolean recordsAreEmpty() {
+        return weeklyRecords.isEmpty();
+    }
+
+    public boolean isInvalidTaskIndex(String indexString) {
+        if (!indexString.matches("\\d")) {
             return true;
         }
-
-        return false;
+        
+        int index = Integer.parseInt(indexString);
+        return index < 1 || index > taskNames.size() + 1;
     }
 
     private void readFile(String fileName) throws IOException {
@@ -132,7 +140,10 @@ public class TimeTracker {
                     currentRecord.add(new DailyTask(newDate, parts[1], Integer.parseInt(parts[2])));
                 }
 
-                weeklyRecords.add(currentRecord);
+                if (currentRecord != null) {
+                    weeklyRecords.add(currentRecord);
+                }
+                
 
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
