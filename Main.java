@@ -5,21 +5,21 @@ public class Main {
     
     public static void main(String[] args) throws IOException {
         TimeTracker tracker = new TimeTracker();
-        if (tracker.recordsAreEmpty()) {
-            System.out.println("\nThere are no tasks being tracked\n");
-        } else {
-            tracker.printToday();
-            tracker.printWeek();
-        }
+        tracker.writeToFile();
+
+        // if (tracker.recordsAreEmpty()) {
+        //     System.out.println("\nThere are no tasks being tracked\n");
+        // } else {
+        //     tracker.printToday();
+        //     tracker.printWeek();
+        // }
         
-        if (args.length == 0 || !"-p".equals(args[0])) {
-            Scanner keyboard = new Scanner(System.in);
-            runTracker(tracker, keyboard);
-            keyboard.close();
-        }
-
+        // if (args.length == 0 || !"-p".equals(args[0])) {
+        //     Scanner keyboard = new Scanner(System.in);
+        //     runTracker(tracker, keyboard);
+        //     keyboard.close();
+        // }
     }
-
 
     public static void runTracker(TimeTracker tracker, Scanner scan) {
         String userInput;
@@ -63,10 +63,7 @@ public class Main {
                 tracker.printToday();
                 tracker.printWeek();
             }
-
         }
-
-        return;
     }
 
     public static void logTime(TimeTracker tracker, Scanner scan) {
@@ -133,8 +130,7 @@ public class Main {
         if ("y".equalsIgnoreCase(userInput) || "yes".equalsIgnoreCase(userInput)) {
             String removedTask = tracker.removeTask(index);
             System.out.printf("\n\"%s\" removed from tasks\n", removedTask);
-        }
-        
+        }   
     }
 
 }

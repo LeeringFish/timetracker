@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -12,10 +13,12 @@ public class TimeTracker {
     
     private ArrayList<DailyRecord> weeklyRecords;
     private ArrayList<String> taskNames;
+    private ArrayList<String> oldRecords;
     private Map<String, Integer> weeklyTotalsByTask;
 
     public TimeTracker() throws IOException {
         weeklyRecords = new ArrayList<DailyRecord>();
+        oldRecords = new ArrayList<String>();
         readFile(FILE_NAME);
         if (weeklyRecords.isEmpty()) {
             taskNames = new ArrayList<String>();
@@ -106,6 +109,20 @@ public class TimeTracker {
         return index < 1 || index > taskNames.size() + 1;
     }
 
+    public void writeToFile() throws IOException {
+        try (PrintWriter writer = new PrintWriter(FILE_NAME, "UTF-8")) {
+            for (String line : oldRecords) {
+                writer.println(line);
+            }
+            for (DailyRecord record : weeklyRecords) {
+                for (DailyTask task : record.getTasks()) {
+                    String line = String.format("%s;%s;%d", task.getDate(), task.getName(), task.getMinutes());
+                    writer.println(line);
+                }
+            }
+        }
+    }
+
     private void readFile(String fileName) throws IOException {
         Path path = Path.of(fileName);
         if (Files.notExists(path)) {
@@ -123,6 +140,8 @@ public class TimeTracker {
 
                     newDate = LocalDate.parse(parts[0]);
                     if (dateNotInPastWeek(newDate)) {
+                        // add to oldRecords collection (should this just hold the full text up until the past week?)
+                        oldRecords.add(line);
                         continue;
                     }
 
