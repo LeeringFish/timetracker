@@ -5,23 +5,22 @@ public class Main {
     
     public static void main(String[] args) throws IOException {
         TimeTracker tracker = new TimeTracker();
-        tracker.writeToFile();
 
-        // if (tracker.recordsAreEmpty()) {
-        //     System.out.println("\nThere are no tasks being tracked\n");
-        // } else {
-        //     tracker.printToday();
-        //     tracker.printWeek();
-        // }
+        if (tracker.recordsAreEmpty()) {
+            System.out.println("\nThere are no tasks being tracked\n");
+        } else {
+            tracker.printToday();
+            tracker.printWeek();
+        }
         
-        // if (args.length == 0 || !"-p".equals(args[0])) {
-        //     Scanner keyboard = new Scanner(System.in);
-        //     runTracker(tracker, keyboard);
-        //     keyboard.close();
-        // }
+        if (args.length == 0 || !"-p".equals(args[0])) {
+            Scanner keyboard = new Scanner(System.in);
+            runTracker(tracker, keyboard);
+            keyboard.close();
+        }
     }
 
-    public static void runTracker(TimeTracker tracker, Scanner scan) {
+    public static void runTracker(TimeTracker tracker, Scanner scan) throws IOException {
         String userInput;
         while (tracker.recordsAreEmpty()) {
             System.out.print("Would you like to add a new task (y/n)? ");
@@ -52,7 +51,7 @@ public class Main {
                 case "2" -> addDailyTask(tracker, scan);
                 case "3" -> removeDailyTask(tracker, scan);
                 case "4" -> {
-                    // write to file
+                    tracker.writeToFile();
                     running = false;
                 }
                 default -> System.out.println("Invalid selection\n");
