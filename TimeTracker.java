@@ -26,7 +26,6 @@ public class TimeTracker {
         } else {
             updateTotalsAndTasks();
         }
-        
     }
 
     public DailyRecord getCurrentRecord() {
@@ -73,7 +72,6 @@ public class TimeTracker {
     }
 
     public void addTime(int minutes, int index) {
-        // assuming correct index based on menu
         getCurrentRecord().getTasks().get(index).addMinutes(minutes);
         weeklyTotalsByTask = getWeeklyTotals();
     }
@@ -101,7 +99,11 @@ public class TimeTracker {
     }
 
     public boolean isInvalidTaskIndex(String indexString) {
-        if (!indexString.matches("\\d")) {
+        if (indexString == null) {
+            return true;
+        }
+        
+        if (!indexString.trim().matches("\\d+")) {
             return true;
         }
         
@@ -140,7 +142,6 @@ public class TimeTracker {
 
                     newDate = LocalDate.parse(parts[0]);
                     if (dateNotInPastWeek(newDate)) {
-                        // add to oldRecords collection (should this just hold the full text up until the past week?)
                         oldRecords.add(line);
                         continue;
                     }
@@ -161,8 +162,7 @@ public class TimeTracker {
 
                 if (currentRecord != null) {
                     weeklyRecords.add(currentRecord);
-                }
-                
+                }      
 
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
