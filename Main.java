@@ -132,4 +132,16 @@ public class Main {
         }   
     }
 
+    public static void clearScreen() {
+        try {
+            var clearCommand = System.getProperty("os.name").contains("Windows")
+                    ? new ProcessBuilder("cmd", "/c", "cls")
+                    : new ProcessBuilder("clear");
+            clearCommand.inheritIO().start().waitFor();
+        }
+        catch (IOException | InterruptedException e) {
+            System.out.println("Exception in clearScreen() method");
+        }
+    }
+
 }

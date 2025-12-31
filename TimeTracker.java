@@ -46,7 +46,7 @@ public class TimeTracker {
         System.out.println("Past Seven Days");
         System.out.println("---------------");
         for (String name : taskNames) {
-            int totalMinutes = weeklyTotalsByTask.get(name);
+            int totalMinutes = weeklyTotalsByTask.getOrDefault(name, 0);
             System.out.printf("%s: %s\n", name, minutesToHoursDoubleString(totalMinutes));
         }
         System.out.println("\n");
@@ -172,11 +172,11 @@ public class TimeTracker {
 
     private void addRecord(LocalDate date) {
         taskNames = getCurrentRecord().getTaskNames();
-                DailyRecord newRecord = new DailyRecord(date);
-                for (String taskName : taskNames) {
-                    newRecord.add(new DailyTask(date, taskName, 0));
-                }
-                weeklyRecords.add(newRecord);
+        DailyRecord newRecord = new DailyRecord(date);
+        for (String taskName : taskNames) {
+            newRecord.add(new DailyTask(date, taskName, 0));
+        }
+        weeklyRecords.add(newRecord);
     }
 
     private HashMap<String, Integer> getWeeklyTotals() {
