@@ -53,10 +53,11 @@ public class TimeTracker {
     }
 
     public void printMainMenu() {
-        String[] options = {"Log Time", "Add Daily Task", "Remove Daily Task", "Quit"};
+        String[] options = {"Log Time", "Add Daily Task", "Remove Daily Task"};
         for (int i = 0; i < options.length; i++) {
             System.out.printf("%d. %s\n", (i + 1), options[i]);
         }
+        System.out.println("0. Quit");
         System.out.println();
     }
 
@@ -66,8 +67,7 @@ public class TimeTracker {
             System.out.printf("%d. %s\n", (i + 1), taskNames.get(i));
             i++;
         }
-        i++;
-        System.out.println(i + ". Main Menu\n");
+        System.out.println("0. Main Menu\n");
     }
 
     public void addTime(int minutes, int index) {
@@ -107,7 +107,7 @@ public class TimeTracker {
         }
         
         int index = Integer.parseInt(indexString);
-        return index < 1 || index > taskNames.size() + 1;
+        return index < 0 || index > taskNames.size();
     }
 
     public void writeToFile() throws IOException {

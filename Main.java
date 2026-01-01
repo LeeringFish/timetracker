@@ -49,13 +49,16 @@ public class Main {
                 case "1" -> logTime(tracker, scan);
                 case "2" -> addDailyTask(tracker, scan);
                 case "3" -> removeDailyTask(tracker, scan);
-                case "4" -> {
+                case "0" -> {
                     tracker.writeToFile();
                     running = false;
                     clearScreen();
                 }
-                default -> System.out.println("Invalid selection\n");
-                
+                default -> {
+                    System.out.println("Invalid selection\n");
+                    scan.nextLine();
+                    clearScreen();
+                }
             }
             
             tracker.printToday();
@@ -81,7 +84,7 @@ public class Main {
         }
 
         index = Integer.parseInt(userInput) - 1;
-        if (index == tracker.getCurrentRecord().getTaskNames().size()) {
+        if (index == -1) {
             clearScreen();
             return;
         }
@@ -133,7 +136,7 @@ public class Main {
         }
 
         int index = Integer.parseInt(userInput) - 1;
-        if (index == tracker.getCurrentRecord().getTaskNames().size()) {
+        if (index == -1) {
             clearScreen();
             return;
         }
