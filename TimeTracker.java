@@ -61,7 +61,6 @@ public class TimeTracker {
     }
 
     public void printAddRemoveMenu() {
-        System.out.println();
         int i = 0;
         while (i < taskNames.size()) {
             System.out.printf("%d. %s\n", (i + 1), taskNames.get(i));

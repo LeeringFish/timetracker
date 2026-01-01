@@ -34,11 +34,10 @@ public class Main {
                 System.out.print("Enter task to add: ");
                 userInput = scan.nextLine();
                 tracker.addNewTask(userInput);
-                tracker.printToday();
-                tracker.printWeek();
             }
         }
 
+        clearAndPrintAll(tracker);
         boolean running = true;
         
         while (running) {
@@ -53,15 +52,14 @@ public class Main {
                 case "4" -> {
                     tracker.writeToFile();
                     running = false;
+                    clearScreen();
                 }
                 default -> System.out.println("Invalid selection\n");
                 
             }
-
-            if (running) {
-                tracker.printToday();
-                tracker.printWeek();
-            }
+            
+            tracker.printToday();
+            tracker.printWeek();
         }
     }
 
@@ -71,6 +69,7 @@ public class Main {
         String msg2 = "Enter number of minutes worked: ";
         int index, minutes;
 
+        clearAndPrintAll(tracker);
         tracker.printAddRemoveMenu();
         System.out.print(msg);
         userInput = scan.nextLine().trim();
@@ -83,6 +82,7 @@ public class Main {
 
         index = Integer.parseInt(userInput) - 1;
         if (index == tracker.getCurrentRecord().getTaskNames().size()) {
+            clearScreen();
             return;
         }
 
@@ -97,18 +97,31 @@ public class Main {
 
         minutes = Integer.parseInt(userInput);
         tracker.addTime(minutes, index);
+        System.out.println("Time added");
+        scan.nextLine();
+        clearScreen();
     }
 
     public static void addDailyTask(TimeTracker tracker, Scanner scan) {
+        clearAndPrintAll(tracker);
         System.out.print("Enter task to add: ");
         String userInput = scan.nextLine();
+        if (userInput.isEmpty()) {
+            clearScreen();
+            return;
+        }
+
         tracker.addNewTask(userInput);
+        System.out.println("Task added");
+        scan.nextLine();
+        clearScreen();
     }
 
     public static void removeDailyTask(TimeTracker tracker, Scanner scan) {
         String msg = "Enter task to remove: ";
         String userInput;
 
+        clearAndPrintAll(tracker);
         tracker.printAddRemoveMenu();
         System.out.print(msg);
         userInput = scan.nextLine();
@@ -121,6 +134,7 @@ public class Main {
 
         int index = Integer.parseInt(userInput) - 1;
         if (index == tracker.getCurrentRecord().getTaskNames().size()) {
+            clearScreen();
             return;
         }
 
@@ -129,7 +143,16 @@ public class Main {
         if ("y".equalsIgnoreCase(userInput) || "yes".equalsIgnoreCase(userInput)) {
             String removedTask = tracker.removeTask(index);
             System.out.printf("\n\"%s\" removed from tasks\n", removedTask);
-        }   
+            scan.nextLine();
+        }
+        
+        clearScreen();
+    }
+
+    public static void clearAndPrintAll(TimeTracker tracker) {
+        clearScreen();
+        tracker.printToday();
+        tracker.printWeek();
     }
 
     public static void clearScreen() {
